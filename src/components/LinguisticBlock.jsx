@@ -1,13 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 
-const nodeColorMap = {
-  'Sentence': '#FDF6E3',
-  'Modal Phrase': '#F7C948',
-  'Verb Phrase': '#E9B949',
-  'Noun Phrase': '#F4A259',
-  'Prepositional Phrase': '#DFAF2B',
-  'Adjective Phrase': '#F6AA64',
-  'Adverbial Phrase': '#E6A141',
+// Цветовая схема
+const partOfSpeechColors = {
   'Pronoun': '#6DBF4B',
   'Verb': '#3D9970',
   'Auxiliary Verb': '#4ECDC4',
@@ -18,86 +12,152 @@ const nodeColorMap = {
   'Preposition': '#8FAF5A',
   'Determiner': '#567D46',
   'Article': '#567D46',
-  'Conjunction': '#228B22'
+  'Conjunction': '#228B22',
+  'Modal Phrase': '#F7C948',
+  'Verb Phrase': '#E9B949',
+  'Noun Phrase': '#F4A259',
+  'Prepositional Phrase': '#DFAF2B',
+  'Adjective Phrase': '#F6AA64',
+  'Adverbial Phrase': '#E6A141'
 };
 
-const NodeCard = ({ node }) => {
-  const [expanded, setExpanded] = useState(false);
-  const color = nodeColorMap[node.part_of_speech || node.phraseType || node.type] || '#999';
+const NodeBox = ({ node }) => {
+  const [showDetails, setShowDetails] = useState(false);
+  const ref = useRef(null);
+
+  const color = partOfSpeechColors[node.part_of_speech || node.phraseType || node.type] || '#ccc';
 
   return (
-    <div className="relative flex flex-col items-center">
+    <div ref={ref} className="flex flex-col items-center relative mx-2 my-4">
       <div
-        className="rounded-lg shadow-md px-3 py-2 text-white text-xs text-center cursor-pointer"
+        className="px-2 py-1 rounded-lg text-white text-sm font-semibold"
         style={{ backgroundColor: color }}
-        onClick={() => setExpanded(!expanded)}
+        onClick={() => setShowDetails(!showDetails)}
       >
-        <div className="font-semibold">{node.part_of_speech || node.phraseType || node.type}</div>
-        <div className="text-sm">{node.content}</div>
+        {node.part_of_speech || node.phraseType || node.type}
       </div>
+      <div className="mt-1 text-white font-medium">{node.content}</div>
 
-      {expanded && (
-        <div className="absolute left-full top-0 ml-4 w-64 bg-neutral-800 text-white text-xs border border-gray-600 rounded-lg p-2 z-10">
-          <div><span className="font-bold">Tense:</span> {node.tense}</div>
-          <div><span className="font-bold">Phonetic:</span> {node.phonetic?.uk || '—'}</div>
-          <div><span className="font-bold">Translation:</span>
-            <ul className="list-disc list-inside">
-              {(node.translations || []).map((tr, i) => <li key={i}>{tr}</li>)}
-            </ul>
-          </div>
-          <div><span className="font-bold">Notes:</span>
-            <ul className="list-disc list-inside">
-              {(node.linguistic_notes || []).map((note, i) => <li key={i}>{note}</li>)}
-            </ul>
-          </div>
-        </div>
-      )}
-    </div>
-  );
-};
-
-const renderEdges = (parentRef, childRefs) => {
-  return childRefs.map((childRef, idx) => (
-    <line
-      key={idx}
-      x1={parentRef.x + parentRef.width / 2}
-      y1={parentRef.y + parentRef.height}
-      x2={childRef.x + childRef.width / 2}
-      y2={childRef.y}
-      stroke="#aaa"
-      strokeWidth="1.5"
-    />
-  ));
-};
-
-const GraphTree = ({ node }) => {
-  const [childVisible, setChildVisible] = useState(true);
-  const children = node["linguistic elements"] || [];
-
-  return (
-    <div className="flex flex-col items-center">
-      <NodeCard node={node} />
-
-      {children.length > 0 && (
+      {showDetails && (
         <>
-          <button
-            onClick={() => setChildVisible(!childVisible)}
-            className="text-white text-xs my-1"
-          >
-            {childVisible ? 'Hide Children' : 'Show Children'}
-          </button>
-
-          {childVisible && (
-            <div className="mt-2 flex justify-center gap-4 flex-wrap">
-              {children.map((child, i) => (
-                <GraphTree key={i} node={child} />
-              ))}
-            </div>
-          )}
+          <div className="w-0.5 h-6 bg-gray-500 my-2" />
+          <div className="bg-gray-900 text-white border border-gray-600 rounded-lg p-4 w-72 text-sm">
+            {node.tense && <div><strong>Tense:</strong> {node.tense}</div>}
+            {node.phonetic?.uk && <div><strong>Phonetic:</strong> {node.phonetic.uk}</div>}
+            {node.linguistic_notes && (
+              <div className="mt-1">
+                <strong>Notes:</strong>
+                <ul className="list-disc list-inside">
+                  {node.linguistic_notes.map((n, i) => (
+                    <li key={i}>{n}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
+            {node.translations && (
+              <div className="mt-1">
+                <strong>Translations:</strong>
+                <ul className="list-disc list-inside">
+                  {node.translations.map((t, i) => (
+                    <li key={i}>{t}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
+            {node.cefr_level && <div><strong>CEFR:</strong> {node.cefr_level}</div>}
+            {node.definitions?.length > 0 && (
+              <div className="mt-1">
+                <strong>Definition:</strong>
+                <ul className="list-disc list-inside">
+                  {node.definitions.map((d, i) => (
+                    <li key={i}>{d.sense}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
+            {node.examples?.length > 0 && (
+              <div className="mt-1">
+                <strong>Examples:</strong>
+                <ul className="list-disc list-inside">
+                  {node.examples.map((e, i) => (
+                    <li key={i}>{e}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
+            {node.synonyms?.length > 0 && (
+              <div className="mt-1">
+                <strong>Synonyms:</strong> {node.synonyms.join(', ')}
+              </div>
+            )}
+          </div>
         </>
       )}
     </div>
   );
 };
 
-export default GraphTree;
+const SVGLine = ({ fromRef, toRef }) => {
+  const [coords, setCoords] = useState(null);
+
+  useEffect(() => {
+    const update = () => {
+      if (fromRef.current && toRef.current) {
+        const from = fromRef.current.getBoundingClientRect();
+        const to = toRef.current.getBoundingClientRect();
+        const svgRect = document.getElementById('svg-root')?.getBoundingClientRect() || { left: 0, top: 0 };
+        setCoords({
+          x1: from.left + from.width / 2 - svgRect.left,
+          y1: from.bottom - svgRect.top,
+          x2: to.left + to.width / 2 - svgRect.left,
+          y2: to.top - svgRect.top
+        });
+      }
+    };
+    update();
+    window.addEventListener('resize', update);
+    return () => window.removeEventListener('resize', update);
+  }, [fromRef, toRef]);
+
+  if (!coords) return null;
+
+  return (
+    <line
+      x1={coords.x1}
+      y1={coords.y1}
+      x2={coords.x2}
+      y2={coords.y2}
+      stroke="#888"
+      strokeWidth="1.5"
+    />
+  );
+};
+
+const LinguisticNode = ({ node }) => {
+  const thisRef = useRef(null);
+  const childRefs = (node["linguistic elements"] || []).map(() => React.createRef());
+
+  return (
+    <div className="flex flex-col items-center relative">
+      <NodeBox node={node} ref={thisRef} />
+      <div className="flex justify-center">
+        {(node["linguistic elements"] || []).map((child, i) => (
+          <div key={i} className="flex justify-center">
+            <LinguisticNode node={child} />
+          </div>
+        ))}
+      </div>
+      <svg id="svg-root" className="absolute top-0 left-0 w-full h-full pointer-events-none z-0">
+        {(node["linguistic elements"] || []).map((_, i) => (
+          <SVGLine
+            key={i}
+            fromRef={thisRef}
+            toRef={childRefs[i]}
+          />
+        ))}
+      </svg>
+    </div>
+  );
+};
+
+export default LinguisticNode;

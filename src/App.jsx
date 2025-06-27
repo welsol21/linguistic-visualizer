@@ -1,19 +1,15 @@
-// src/App.jsx
 import React from 'react';
-import './index.css';
-import Block from './components/LinguisticBlock';
-import jsonData from './data/sample.json';
+import LinguisticNode from './components/LinguisticBlock';
+import data from './data/sample.json';
 
-export default function App() {
-  const rootSentenceKey = Object.keys(jsonData)[0];
-  const rootNode = jsonData[rootSentenceKey];
-
+function App() {
+  const root = Object.values(data)[0]; // первый Sentence
   return (
-    <div className="min-h-screen bg-black text-white py-8">
-      <h1 className="text-3xl font-bold text-yellow-400 text-center mb-8">Linguistic Visualizer</h1>
-      <div className="flex justify-center">
-        <Block node={rootNode} />
-      </div>
+    <div className="bg-black min-h-screen text-white p-8">
+      <h1 className="text-yellow-400 text-3xl font-bold text-center mb-6">Linguistic Visualizer</h1>
+      <LinguisticNode node={root} />
     </div>
   );
 }
+
+export default App;
