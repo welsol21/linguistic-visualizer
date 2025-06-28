@@ -1,3 +1,4 @@
+// src/components/NodeBox.jsx
 import React from "react";
 
 // Цветовая карта для всех типов
