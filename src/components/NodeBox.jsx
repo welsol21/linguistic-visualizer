@@ -1,6 +1,6 @@
-// src/components/NodeBox.jsx
 import React from "react";
 
+// Цветовая карта для всех типов
 const colorMap = {
   "sentence": "#FDF6E3",
   "modal phrase": "#F7C948",
@@ -19,16 +19,17 @@ const colorMap = {
   "preposition": "#8FAF5A",
   "determiner": "#567D46",
   "article": "#567D46",
-  "conjunction": "#228B22"
+  "conjunction": "#228B22",
 };
 
 const NodeBox = React.forwardRef(({ node, onToggle, expanded }, ref) => {
   const label = node.part_of_speech || node.phraseType || node.type || "unknown";
   const color = colorMap[label.toLowerCase()] || "#cccccc";
+  const children = node["linguistic elements"] || [];
 
   return (
     <div ref={ref} className="flex flex-col items-center relative mx-2 my-4">
-      {/* Цветной прямоугольник */}
+      {/* Прямоугольник с меткой */}
       <div
         className="px-2 py-1 rounded-lg text-black text-sm font-semibold cursor-pointer"
         style={{ backgroundColor: color }}
@@ -37,10 +38,38 @@ const NodeBox = React.forwardRef(({ node, onToggle, expanded }, ref) => {
         {label}
       </div>
 
-      {/* Подпись контента */}
-      <div className="mt-1 text-white font-medium underline underline-offset-2">{node.content}</div>
+      {/* Подпись с подчёркиваниями по цветам дочерних элементов */}
+      {children.length > 0 ? (
+        <div className="text-white text-lg font-medium flex flex-wrap justify-center gap-[3px] mt-1">
+          {children.map((child, i) => {
+            const subLabel = child.part_of_speech || child.phraseType || child.type || "unknown";
+            const subColor = colorMap[subLabel.toLowerCase()] || "#888";
+            return (
+              <span
+                key={i}
+                style={{
+                  borderBottom: `3px solid ${subColor}`,
+                  paddingBottom: "2px",
+                }}
+              >
+                {child.content}
+              </span>
+            );
+          })}
+        </div>
+      ) : (
+        <div
+          className="text-white text-lg font-medium mt-1"
+          style={{
+            borderBottom: `3px solid ${color}`,
+            paddingBottom: "2px",
+          }}
+        >
+          {node.content}
+        </div>
+      )}
 
-      {/* Карточка (при раскрытии) */}
+      {/* Детальная карточка при раскрытии */}
       {expanded && (
         <div className="mt-3 bg-gray-900 text-white border border-gray-600 rounded-lg p-4 w-72 text-sm z-10">
           {node.tense && <div><strong>Tense:</strong> {node.tense}</div>}
