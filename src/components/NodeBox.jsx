@@ -72,51 +72,72 @@ const NodeBox = React.forwardRef(({ node, onToggle, expanded }, ref) => {
 
       {/* Детальная карточка при раскрытии */}
       {expanded && (
-        <div className="mt-3 bg-gray-900 text-white border border-gray-600 rounded-lg p-4 w-72 text-sm z-10">
-          {node.tense && <div><strong>Tense:</strong> {node.tense}</div>}
-          {node.phonetic?.uk && <div><strong>Phonetic:</strong> {node.phonetic.uk}</div>}
+        <div className="mt-3 w-[300px] rounded-xl shadow-lg border border-gray-700 bg-gradient-to-br from-gray-800 to-gray-900 text-white z-10 p-4 text-sm space-y-3">
+          {node.tense && (
+            <div>
+              <span className="text-gray-400 font-medium">Tense:</span> {node.tense}
+            </div>
+          )}
 
-          {node.linguistic_notes?.length > 0 && (
-            <div className="mt-1">
-              <strong>Notes:</strong>
-              <ul className="list-disc list-inside">
-                {node.linguistic_notes.map((n, i) => <li key={i}>{n}</li>)}
-              </ul>
+          {node.cefr_level && (
+            <div>
+              <span className="text-gray-400 font-medium">CEFR:</span> {node.cefr_level}
+            </div>
+          )}
+
+          {node.phonetic?.uk && (
+            <div>
+              <span className="text-gray-400 font-medium">Phonetic:</span> / {node.phonetic.uk} /
             </div>
           )}
 
           {node.translations?.length > 0 && (
-            <div className="mt-1">
-              <strong>Translations:</strong>
-              <ul className="list-disc list-inside">
-                {node.translations.map((t, i) => <li key={i}>{t}</li>)}
+            <div>
+              <span className="text-gray-400 font-medium">Translations:</span>
+              <ul className="text-sm mt-1 space-y-1">
+                {node.translations.map((t, i) => (
+                  <li key={i}>{t}</li>
+                ))}
               </ul>
             </div>
           )}
 
-          {node.cefr_level && <div><strong>CEFR:</strong> {node.cefr_level}</div>}
-
-          {node.definitions?.length > 0 && (
-            <div className="mt-1">
-              <strong>Definition:</strong>
-              <ul className="list-disc list-inside">
-                {node.definitions.map((d, i) => <li key={i}>{d.sense}</li>)}
-              </ul>
+          {node.linguistic_notes?.length > 0 && (
+            <div>
+              <span className="text-gray-400 font-medium">Notes:</span>
+              <div className="text-sm mt-1 space-y-1">
+                {node.linguistic_notes.map((n, i) => (
+                  <div key={i}>{n}</div>
+                ))}
+              </div>
             </div>
           )}
+
+          {/* {node.definitions?.length > 0 && (
+            <div>
+              <span className="text-gray-400 font-medium">Definition:</span>
+              <ul className="text-sm mt-1 space-y-1">
+                {node.definitions.map((d, i) => (
+                  <li key={i}>{d.sense}</li>
+                ))}
+              </ul>
+            </div>
+          )} */}
 
           {node.examples?.length > 0 && (
-            <div className="mt-1">
-              <strong>Examples:</strong>
-              <ul className="list-disc list-inside">
-                {node.examples.map((e, i) => <li key={i}>{e}</li>)}
+            <div>
+              <span className="text-gray-400 font-medium">Examples:</span>
+              <ul className="list-disc list-inside text-sm mt-1 space-y-1">
+                {node.examples.map((e, i) => (
+                  <li key={i}>{e}</li>
+                ))}
               </ul>
             </div>
           )}
 
           {node.synonyms?.length > 0 && (
-            <div className="mt-1">
-              <strong>Synonyms:</strong> {node.synonyms.join(", ")}
+            <div>
+              <span className="text-gray-400 font-medium">Synonyms:</span> {node.synonyms.join(", ")}
             </div>
           )}
         </div>
